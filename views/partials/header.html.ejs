@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <% stylesheets.forEach(s => { %>
+        <link href="/assets/css/<%= s %>" rel="stylesheet"></link>
+    <% }) %>
+    <% jsScripts.forEach(s => { %>
+        <script type="text/javascript" src="/assets/js/<%= s %>"></script>
+    <% }) %>
+    <title>Document</title>
+</head>
+<body <% if (darkMode) { %> class="dark-mode" <% } %> >
+<div id="header">
+    <div id="nav">
+        <div class="nav-section">
+            <a class="a-d" href="/"><h2>The ULTIMATE Quiz</h2></a>
+        </div>
+        <div class="nav-section">
+            <a class="section-element a-d" href="/">Home</a>
+            <a class="section-element a-d" href="/">The Quiz</a>
+            <a class="section-element a-d" href="/">Compete</a>
+            <a class="section-element a-d" href="/">Community</a>
+        </div>
+    </div>
+</div>
+<div id="header-space"></div>
