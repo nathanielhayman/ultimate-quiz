@@ -2,6 +2,8 @@ window.onload = () => {
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
 
+    const id = urlParams.get('id');
+
     if (urlParams.get('last')) {
         if (urlParams.get('last') == 'c') {
             let c = document.querySelector("#correct");
@@ -13,9 +15,18 @@ window.onload = () => {
             setTimeout(() => i.setAttribute("style", "display: none"), 2000);
         }
     }
+
+    document.addEventListener('keyup', (e) => {
+        if (e.key == "Enter") {
+            let input = document.querySelector('#answer');
+            if (input) {
+                resolveAnswer(id, input.value);
+            }
+        }
+    })
 }
 
-function resolveAnswer(id, answer, question, difficulty) {
+function resolveAnswer(id, answer) {
     const API_URL = "http://localhost:3000";
     const callOptions = {
         method: 'POST',
@@ -30,10 +41,9 @@ function resolveAnswer(id, answer, question, difficulty) {
         .then(result => {
             console.log(result);
             if (result.result == "correct") {
-                window.location.href = `http://localhost:3000/quiz?question=${question+1}&last=c&difficulty=${difficulty}`
-                
+                window.location.href = `http://localhost:3000/quiz?id=${id}&last=c`
             } else {
-                window.location.href = `http://localhost:3000/quiz?question=${question+1}&last=i&difficulty=${difficulty}`
+                window.location.href = `http://localhost:3000/quiz?id=${id}&last=i`
             }
         });
 }

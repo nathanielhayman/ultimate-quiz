@@ -12,30 +12,16 @@
         <p>What country is this?</p>
         <br>
         <% if (difficultyLevel == "hard") { %>
-            <input id="answer" class="text-input" type="text">
+            <input id="answer" class="text-input" type="text" autofocus>
         <% } else if (difficultyLevel == "med") { %>
             <% answers.forEach(a => { %>
                 <input class="answer-btn" type="button" value="<%= a["country"] %>" 
-                    onclick="resolveAnswer('<%= id %>', '<%= a["country"] %>', 
-                            <%= question %>, '<%= difficultyLevel %>')">
+                    onclick="resolveAnswer('<%= id %>', '<%= a["country"] %>')">
             <% }) %>
         <% } %>
     </div>
 
     <br>
-    <div class="flex-seperate" style="display: none;">
-        <div></div>
-        <div class="flex-middle">
-            <h3 style="padding-right: 1rem;">Difficulty</h3>
-            <div id="difficulty-display">
-                <div class="difficulty-dot left"></div>
-                <div class="difficulty-dot mid"></div>
-                <div class="difficulty-dot right"></div>
-                <div class="difficulty-bar">
-                    <div class="difficulty-fill"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+    
     
 <%- include('../partials/footer.html.ejs') %>

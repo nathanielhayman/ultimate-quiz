@@ -2,7 +2,7 @@ fs = require('fs');
 const { count } = require('console');
 const countries = require('../question_assets/geography/countries.json');
 
-quizzes = {};
+var quizzes = require('../db/quizzes.json');
 
 let scripts = [];
 
@@ -20,6 +20,27 @@ fs.readdir('./assets/css', (err, files) => {
   });
 });
 
+function writeJSON(json) {
+  fs.writeFile('./db/quizzes.json', JSON.stringify(json), (err) => {
+    if (err) {
+        throw err;
+    }
+  });
+}
+
+function getAnswers(difficultyLevel, answer) {
+  let answerArr = ['', '', '', ''];
+  if (difficultyLevel == "med") {
+    let position = Math.floor(Math.random() * 4);
+    for (let i = 0; i < 4; i++) {
+      let country = countries[Math.floor(Math.random() * countries.length)];
+      if (i != position && answerArr.indexOf(country) == -1) answerArr[i] = country;
+    }
+    answerArr[position] = answer;
+  }
+  return answerArr;
+}
+
 module.exports = {
     configure: (app) => {
         app.get('/', function (req, res) {
@@ -31,9 +52,9 @@ module.exports = {
         });
 
         app.post('/check-answer', function(req, res) {
-          console.log(req.body);
-          if (quizzes[`${req.body.id}`]) {
-            if (quizzes[`${req.body.id}`]["country"].toLowerCase().replace(/[^a-z]/g, '') == req.body.answer) {
+          let quiz = quizzes[`${req.body.id}`]; 
+          if (quiz) {
+            if (quiz.answer.country.toLowerCase().replace(/[^a-z]/g, '') == req.body.answer) {
               res.json({
                 "result": "correct"
               });
@@ -42,47 +63,59 @@ module.exports = {
                 "result": "incorrect"
               });
             }
-            delete quizzes[`${req.body.id}`];
+            //delete quizzes[`${req.body.id}`];
+            quiz.question++;
+            writeJSON(quizzes);
           }
         });
 
         app.get('/quiz', function (req, res) {
 
-            let correct = countries[Math.floor(Math.random() * countries.length)];
-
-            let answerArr = ['', '', '', ''];
-            let difficultyLevel = req.query.difficulty ? req.query.difficulty : "hard";
-            if (difficultyLevel == "med") {
-              let position = Math.floor(Math.random() * 4);
-              for (let i = 0; i < 4; i++) {
-                let country = countries[Math.floor(Math.random() * countries.length)];
-                if (i != position && answerArr.indexOf(country) == -1) answerArr[i] = country;
-              }
-              answerArr[position] = correct;
-            }
-
             let id;
-            if (req.query.idNum != undefined) id = req.query.idNum
-            else initID();
+            if (req.query.id != undefined) { 
+              id = req.query.id
+              let q = quizzes[`${id}`];
+              let correct = countries[Math.floor(Math.random() * countries.length)];
+              let answerArr = getAnswers(q.difficulty, correct);
+              q.answer = correct;
+              q.possibleAnswers = answerArr;
 
-            function initID() {
-              console.log('a');
+              writeJSON(quizzes);
+            } else {
+              let correct = countries[Math.floor(Math.random() * countries.length)];
+
+              let difficultyLevel = req.query.difficultyLevel ? req.query.difficultyLevel : "hard";
+              let answerArr = getAnswers(difficultyLevel, correct);
+
               id = Math.floor(Math.random() * 1000000000);
-              quizzes[`${id}`] = correct;
+              quizzes[`${id}`] = {
+                answer: correct,
+                question: 1,
+                difficulty: difficultyLevel,
+                possibleAnswers: answerArr
+              };
+
+              writeJSON(quizzes);
+
+              res.redirect(`/quiz?id=${id}`);
             }
 
+            console.log(quizzes);
             console.log(id);
+            let quiz = quizzes[`${id}`];
+
+            console.log(quiz);
 
             res.render('quiz/index.html.ejs', {
                 darkMode: true,
                 id: id,
                 jsScripts: scripts,
                 stylesheets: stylesheets,
-                seed: req.query.seed ? req.query.seed : 000000,
-                difficultyLevel: difficultyLevel,
-                question: req.query.question ? req.query.question : 1,
-                country: correct,
-                answers: answerArr
+
+                difficultyLevel: quiz.difficulty,
+                question: quiz.question,
+                country: quiz.answer,
+                answers: quiz.possibleAnswers
             });
         });
     }

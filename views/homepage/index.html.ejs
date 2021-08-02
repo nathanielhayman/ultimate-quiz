@@ -1,4 +1,16 @@
 <%- include('../partials/header.html.ejs') %>
     <br>
-    <a href="/quiz"><div id="start-btn">START</div></a>
+    <div class="flex-middle">
+        <h3 style="padding-right: 1rem;">Difficulty</h3>
+        <div id="difficulty-display">
+            <div class="difficulty-dot left" onclick="changeDifficulty('easy')"></div>
+            <div class="difficulty-dot mid" onclick="changeDifficulty('med')"></div>
+            <div class="difficulty-dot right" onclick="changeDifficulty('hard')"></div>
+            <div class="difficulty-bar">
+                <div class="difficulty-fill"></div>
+            </div>
+        </div>
+    </div>
+    <br><br>
+    <a id="start" href="/quiz"><div id="start-btn">START</div></a>
 <%- include('../partials/footer.html.ejs') %>
