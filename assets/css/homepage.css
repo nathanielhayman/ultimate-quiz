@@ -1,0 +1,100 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700;900&display=swap');
+
+* {
+    font-family: 'Lato', sans-serif;
+    user-select: none;
+}
+
+h1, h2, h3, h4, h5, p, a {
+    margin: 0;
+    text-decoration: none;
+}
+
+a {
+    color: #292929;
+}
+
+a:hover {
+    color: #3d3d3d;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+#header-space {
+    height: 7rem;
+}
+
+#nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    vertical-align: center;
+    background-color: #232b33;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+#start-btn {
+    padding: 1rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    background-color: #41e049;
+    color: #232b33;
+    font-size: 1.6rem;
+    font-weight: 400;
+    margin: auto;
+    text-align: center;
+    max-width: 10rem;
+    cursor: pointer;
+    border-radius: 1.6rem;
+}
+
+#start-btn:hover {
+    background-color: #48f350;
+}
+
+.nav-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    vertical-align: center;
+    padding: 1rem;
+}
+
+.a-d {
+    color: white;
+}
+
+.a-d:hover {
+    color: #dddddd;
+}
+
+.section-element {
+    padding: .6rem;
+}
+
+.section-element:hover {
+    background-color: #2b343d;
+    border-radius: 2rem;
+}
+
+.title {
+    margin: auto;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.dark-mode {
+    background-color: #1b232c;
+    color: #ffffff;
+}

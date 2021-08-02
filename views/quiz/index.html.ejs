@@ -1,4 +1,41 @@
 <%- include('../partials/header.html.ejs') %>
-    
+    <div id="correct">
+        <p>Correct!</p>
+    </div>
+    <div id="incorrect">
+        <p>Incorrect!</p>
+    </div>
+    <div class="question">
+        <h3>Question <%= question %></h3>
+
+        <img id="country-img" src="https://ramiro.org/img/country_shapes/<%= country["abbreviation"].toLowerCase() %>.svg" alt="">
+        <p>What country is this?</p>
+        <br>
+        <% if (difficultyLevel == "hard") { %>
+            <input id="answer" class="text-input" type="text">
+        <% } else if (difficultyLevel == "med") { %>
+            <% answers.forEach(a => { %>
+                <input class="answer-btn" type="button" value="<%= a["country"] %>" 
+                    onclick="resolveAnswer('<%= id %>', '<%= a["country"] %>', 
+                            <%= question %>, '<%= difficultyLevel %>')">
+            <% }) %>
+        <% } %>
+    </div>
+
+    <br>
+    <div class="flex-seperate" style="display: none;">
+        <div></div>
+        <div class="flex-middle">
+            <h3 style="padding-right: 1rem;">Difficulty</h3>
+            <div id="difficulty-display">
+                <div class="difficulty-dot left"></div>
+                <div class="difficulty-dot mid"></div>
+                <div class="difficulty-dot right"></div>
+                <div class="difficulty-bar">
+                    <div class="difficulty-fill"></div>
+                </div>
+            </div>
+        </div>
+    </div>
     
 <%- include('../partials/footer.html.ejs') %>

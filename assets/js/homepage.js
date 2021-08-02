@@ -17,6 +17,5 @@ window.onload = () => {
     }
 
     //animateBtn(startButton, true, 0.9);
-
     console.log("Hello World!");
 }
