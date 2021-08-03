@@ -74,6 +74,7 @@ module.exports = {
             }
             //delete quizzes[`${req.body.id}`];
             quiz.question++;
+            quiz.reloadRequired = true;
             writeJSON(quizzes);
           }
         });
@@ -84,12 +85,14 @@ module.exports = {
             if (req.query.id != undefined) { 
               id = req.query.id
               let q = quizzes[`${id}`];
-              let geo = getGeoAnswers(q.difficulty);
-              let correct = geo.answer, answerArr = geo.answerArr;
-              q.answer = correct;
-              q.possibleAnswers = answerArr;
-
-              writeJSON(quizzes);
+              if (q.reloadRequired) {
+                let geo = getGeoAnswers(q.difficulty);
+                let correct = geo.answer, answerArr = geo.answerArr;
+                q.answer = correct;
+                q.possibleAnswers = answerArr;
+                
+                writeJSON(quizzes);
+              }
             } else {
               let difficultyLevel = req.query.difficultyLevel ? req.query.difficultyLevel : "hard";
               let geo = getGeoAnswers(difficultyLevel);
@@ -102,7 +105,8 @@ module.exports = {
                 streak: 0,
                 question: 1,
                 difficulty: difficultyLevel,
-                possibleAnswers: answerArr
+                possibleAnswers: answerArr,
+                reloadRequired: false
               };
 
               writeJSON(quizzes);
