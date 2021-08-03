@@ -6,10 +6,32 @@
         <p>Incorrect!</p>
     </div>
     <div class="question">
-        <h3>Question <%= question %></h3>
-
-        <img id="country-img" src="https://ramiro.org/img/country_shapes/<%= country["abbreviation"].toLowerCase() %>.svg" alt="">
-        <p>What country is this?</p>
+        <div class="flex-seperate">
+            <div class="flex-middle hover-grow" style="padding-left: 4rem;">
+                <p id="correct-counter"><%= correct %></p>
+                <p style="padding-left: .8rem;">Correct</p>
+            </div>
+            <% if (streak >= 5) { %>
+                <div class="flex-middle hover-grow">
+                    <img style="width: 2.2rem; height: 2.2rem;" src="/assets/images/flame.svg" alt="">
+                    <h3 style="padding-left: .6rem;"><%= streak %>x Streak!</h3>
+                </div>
+            <% } %>
+            <div class="flex-middle hover-grow" style="padding-right: 4rem;">
+                <p id="incorrect-counter"><%= question - correct -1 %></p>
+                <p style="padding-left: .8rem;">Incorrect</p>
+            </div>
+        </div>
+        <% if (streak >= 5) { %> <br><br> <% } %>
+        <h3 class="question-title">QUESTION <%= question %></h3>
+        <br><br>
+        <% if (questionType == "country-image") { %>
+            <img id="country-img" src="https://ramiro.org/img/country_shapes/<%= answer["abbreviation"].toLowerCase() %>.svg" alt="">
+        <% } else if (questionType == "country-flag") { %>
+            <img id="flag-img" class="hover-grow" src="https://flagpedia.net/data/flags/w580/<%= answer["abbreviation"].toLowerCase() %>.png" alt="">
+        <% } %>
+        <br><br><br>
+        <p><%= prompt %></p>
         <br>
         <% if (difficultyLevel == "hard") { %>
             <input id="answer" class="text-input" type="text" autofocus>

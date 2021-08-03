@@ -1,5 +1,4 @@
 fs = require('fs');
-const { count } = require('console');
 const countries = require('../question_assets/geography/countries.json');
 
 var quizzes = require('../db/quizzes.json');
@@ -28,17 +27,25 @@ function writeJSON(json) {
   });
 }
 
-function getAnswers(difficultyLevel, answer) {
+function getGeoAnswers(difficultyLevel) {
+  let answer = countries[Math.floor(Math.random() * countries.length)];
   let answerArr = ['', '', '', ''];
   if (difficultyLevel == "med") {
-    let position = Math.floor(Math.random() * 4);
+    let index = Math.floor(Math.random() * 4);
+    answerArr[index] = answer;
     for (let i = 0; i < 4; i++) {
-      let country = countries[Math.floor(Math.random() * countries.length)];
-      if (i != position && answerArr.indexOf(country) == -1) answerArr[i] = country;
+      let j = Math.floor(Math.random() * countries.length);
+      let country = countries[j];
+      if (i != index) {
+        while (answerArr.indexOf(country) != -1) { 
+          j++;
+          country = countries[j];
+        }
+        answerArr[i] = country;
+      }
     }
-    answerArr[position] = answer;
   }
-  return answerArr;
+  return { answer: answer, answerArr: answerArr };
 }
 
 module.exports = {
@@ -55,10 +62,12 @@ module.exports = {
           let quiz = quizzes[`${req.body.id}`]; 
           if (quiz) {
             if (quiz.answer.country.toLowerCase().replace(/[^a-z]/g, '') == req.body.answer) {
+              quiz.correct++; quiz.streak++;
               res.json({
                 "result": "correct"
               });
             } else {
+              quiz.streak = 0;
               res.json({
                 "result": "incorrect"
               });
@@ -75,21 +84,22 @@ module.exports = {
             if (req.query.id != undefined) { 
               id = req.query.id
               let q = quizzes[`${id}`];
-              let correct = countries[Math.floor(Math.random() * countries.length)];
-              let answerArr = getAnswers(q.difficulty, correct);
+              let geo = getGeoAnswers(q.difficulty);
+              let correct = geo.answer, answerArr = geo.answerArr;
               q.answer = correct;
               q.possibleAnswers = answerArr;
 
               writeJSON(quizzes);
             } else {
-              let correct = countries[Math.floor(Math.random() * countries.length)];
-
               let difficultyLevel = req.query.difficultyLevel ? req.query.difficultyLevel : "hard";
-              let answerArr = getAnswers(difficultyLevel, correct);
+              let geo = getGeoAnswers(difficultyLevel);
+              let correct = geo.answer, answerArr = geo.answerArr;
 
-              id = Math.floor(Math.random() * 1000000000);
+              id = Math.floor(Math.random() * 1000000000000);
               quizzes[`${id}`] = {
                 answer: correct,
+                correct: 0,
+                streak: 0,
                 question: 1,
                 difficulty: difficultyLevel,
                 possibleAnswers: answerArr
@@ -99,12 +109,16 @@ module.exports = {
 
               res.redirect(`/quiz?id=${id}`);
             }
-
-            console.log(quizzes);
-            console.log(id);
+            
             let quiz = quizzes[`${id}`];
 
-            console.log(quiz);
+            if (quiz.question > 5) {
+              quiz.questionType = "country-flag";
+              quiz.prompt = "Which country's flag is this?"
+            } else {
+              quiz.questionType = "country-image";
+              quiz.prompt = "Which country is this?"
+            }
 
             res.render('quiz/index.html.ejs', {
                 darkMode: true,
@@ -114,8 +128,12 @@ module.exports = {
 
                 difficultyLevel: quiz.difficulty,
                 question: quiz.question,
-                country: quiz.answer,
-                answers: quiz.possibleAnswers
+                answer: quiz.answer,
+                answers: quiz.possibleAnswers,
+                questionType: quiz.questionType,
+                prompt: quiz.prompt,
+                correct: quiz.correct,
+                streak: quiz.streak
             });
         });
     }

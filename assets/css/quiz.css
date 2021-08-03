@@ -12,6 +12,10 @@
     filter: invert(48%) sepia(85%) saturate(2476%) hue-rotate(86deg) brightness(200%) contrast(119%);
 }
 
+#flag-img {
+    max-height: 20rem;
+}
+
 #correct {
     display: none;
     position: fixed;
@@ -34,6 +38,24 @@
     background-color: #d64747;
 }
 
+#incorrect-counter {
+    border-radius: 50%;
+    padding: .6rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    color: white;
+    background-color: #d64747;
+}
+
+#correct-counter {
+    border-radius: 100%;
+    padding: .6rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    color: white;
+    background-color: #41e049;
+}
+
 .answer-btn {
     padding: 1rem;
     color: white;
@@ -48,6 +70,11 @@
 
 .answer-btn:hover {
     background-color: #474747;
+}
+
+.question-title {
+    font-weight: 300;
+    font-size: 1.6rem;
 }
 
 .difficulty-dot {

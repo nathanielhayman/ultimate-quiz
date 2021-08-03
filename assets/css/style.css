@@ -1,8 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700;900&display=swap');
+
+* {
+    font-family: 'Lato', sans-serif;
+    user-select: none;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, p, a {
+    margin: 0;
+    text-decoration: none;
+}
+
+a {
+    color: #292929;
+}
+
+a:hover {
+    color: #3d3d3d;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
 .flex-seperate {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    overflow-y: visible;
+    overflow-x: visible;
 }
 
 .flex-middle {
@@ -10,4 +38,15 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    overflow-y: visible;
+    overflow-x: visible;
+}
+
+.hover-grow {
+    z-index: 5;
+    transition: 100ms ease-in-out;
+}
+
+.hover-grow:hover {
+    transform: scale(1.1, 1.1);
 }
