@@ -1,5 +1,6 @@
 fs = require('fs');
 const countries = require('../question_assets/geography/countries.json');
+const greek = require('../question_assets/mythology/greek_gods.json');
 
 var quizzes = require('../db/quizzes.json');
 
@@ -48,6 +49,57 @@ function getGeoAnswers(difficultyLevel) {
   return { answer: answer, answerArr: answerArr };
 }
 
+function getGreekAnswers(difficultyLevel) {
+  let answer = greek[Math.floor(Math.random() * greek.length)];
+  let answerArr = ['', '', '', ''];
+  if (difficultyLevel == "med") {
+    let index = Math.floor(Math.random() * 4);
+    answerArr[index] = answer;
+    for (let i = 0; i < 4; i++) {
+      let j = Math.floor(Math.random() * greek.length);
+      let god = greek[j];
+      if (i != index) {
+        while (answerArr.indexOf(god) != -1) { 
+          j++;
+          god = greek[j];
+        }
+        answerArr[i] = god;
+      }
+    }
+  }
+  return { answer: answer, answerArr: answerArr };
+}
+
+function getAnswers(question, difficultyLevel) {
+  let ret;
+  if (question > 10) {
+    ret = getGreekAnswers(difficultyLevel);
+    ret.questionType = "greek-gods";
+    ret.prompt = "What Greek god matches the above description?";
+  } else if (question > 5) {
+    ret = getGeoAnswers(difficultyLevel);
+    ret.questionType = "country-flag";
+    ret.prompt = "Which country's flag is this?";
+  } else {
+    ret = getGeoAnswers(difficultyLevel);
+    ret.questionType = "country-image";
+    ret.prompt = "Which country is this?";
+  }
+  return ret;
+}
+
+function isAnswerCorrect(answer, req, type) {
+  switch (type) {
+    case 'country-flag':
+    case 'country-image':
+      return answer.country.toLowerCase().replace(/[^a-z]/g, '') == req.body.answer;
+    case 'greek-gods':
+      return answer.name.toLowerCase().replace(/[^a-z]/g, '') == req.body.answer;
+    default:
+      return false;
+  }
+}
+
 module.exports = {
     configure: (app) => {
         app.get('/', function (req, res) {
@@ -61,7 +113,7 @@ module.exports = {
         app.post('/check-answer', function(req, res) {
           let quiz = quizzes[`${req.body.id}`]; 
           if (quiz) {
-            if (quiz.answer.country.toLowerCase().replace(/[^a-z]/g, '') == req.body.answer) {
+            if (isAnswerCorrect(quiz.answer, req, quiz.questionType)) {
               quiz.correct++; quiz.streak++;
               res.json({
                 "result": "correct"
@@ -86,27 +138,29 @@ module.exports = {
               id = req.query.id
               let q = quizzes[`${id}`];
               if (q.reloadRequired) {
-                let geo = getGeoAnswers(q.difficulty);
-                let correct = geo.answer, answerArr = geo.answerArr;
-                q.answer = correct;
-                q.possibleAnswers = answerArr;
-                
+                let setup = getAnswers(q.question, q.difficulty);
+                q.answer = setup.answer;
+                q.possibleAnswers = setup.answerArr;
+                q.questionType = setup.questionType;
+                q.prompt = setup.prompt;
+
                 writeJSON(quizzes);
               }
             } else {
               let difficultyLevel = req.query.difficultyLevel ? req.query.difficultyLevel : "hard";
-              let geo = getGeoAnswers(difficultyLevel);
-              let correct = geo.answer, answerArr = geo.answerArr;
+              let setup = getAnswers(0, difficultyLevel);
 
               id = Math.floor(Math.random() * 1000000000000);
               quizzes[`${id}`] = {
-                answer: correct,
+                answer: setup.answer,
                 correct: 0,
                 streak: 0,
                 question: 1,
                 difficulty: difficultyLevel,
-                possibleAnswers: answerArr,
-                reloadRequired: false
+                possibleAnswers: setup.answerArr,
+                reloadRequired: false,
+                questionType: setup.questionType,
+                prompt: setup.prompt
               };
 
               writeJSON(quizzes);
@@ -115,14 +169,6 @@ module.exports = {
             }
             
             let quiz = quizzes[`${id}`];
-
-            if (quiz.question > 5) {
-              quiz.questionType = "country-flag";
-              quiz.prompt = "Which country's flag is this?"
-            } else {
-              quiz.questionType = "country-image";
-              quiz.prompt = "Which country is this?"
-            }
 
             res.render('quiz/index.html.ejs', {
                 darkMode: true,

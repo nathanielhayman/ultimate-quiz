@@ -26,19 +26,26 @@
         <h3 class="question-title">QUESTION <%= question %></h3>
         <br><br>
         <% if (questionType == "country-image") { %>
-            <img id="country-img" src="https://ramiro.org/img/country_shapes/<%= answer["abbreviation"].toLowerCase() %>.svg" alt="">
+            <img id="country-img" class="hover-grow" src="https://ramiro.org/img/country_shapes/<%= answer["abbreviation"].toLowerCase() %>.svg" alt="">
         <% } else if (questionType == "country-flag") { %>
             <img id="flag-img" class="hover-grow" src="https://flagpedia.net/data/flags/w580/<%= answer["abbreviation"].toLowerCase() %>.png" alt="">
+        <% } else if (questionType == "greek-gods") { %>
+            <h3 class="quote-text hover-grow"><%= answer["trait"] %></h3>
         <% } %>
-        <br><br><br>
+        <br><br>
         <p><%= prompt %></p>
         <br>
         <% if (difficultyLevel == "hard") { %>
             <input id="answer" class="text-input" type="text" autofocus>
         <% } else if (difficultyLevel == "med") { %>
             <% answers.forEach(a => { %>
-                <input class="answer-btn" type="button" value="<%= a["country"] %>" 
-                    onclick="resolveAnswer('<%= id %>', '<%= a["country"] %>')">
+                <% if (questionType == 'country-image' || questionType == 'country-flag') { %>
+                    <input class="answer-btn" type="button" value="<%= a["country"] %>" 
+                        onclick="resolveAnswer('<%= id %>', '<%= a["country"] %>')">
+                <% } else if (questionType == 'greek-gods') { %>
+                    <input class="answer-btn" type="button" value="<%= a["name"] %>" 
+                        onclick="resolveAnswer('<%= id %>', '<%= a["name"] %>')">
+                <% } %>
             <% }) %>
         <% } %>
     </div>
